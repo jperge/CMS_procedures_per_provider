@@ -59,7 +59,8 @@ start = Sys.time()
 if(file.exists(my_data_file) && !exists("physician_data")){
   load(my_data_file)
 } else if(!file.exists(my_data_file)) {
-  physician_data = read.delim(cms_filename, stringsAsFactors=FALSE)
+  #physician_data = read.delim(cms_filename, stringsAsFactors=FALSE)
+  physician_data = data.frame(fread(cms_filename)) #This second way of reading data is ~5 times faster!
   physician_data = physician_data[2:nrow(physician_data),]
   colnames(physician_data) = tolower(colnames(physician_data))
 
