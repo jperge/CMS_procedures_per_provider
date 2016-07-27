@@ -164,10 +164,10 @@ setkey(doctor_procedure, "hcpcs_code")
 doctor_procedure = merge(doctor_procedure, toAppend, by='hcpcs_code')
 
 setkey(doctor_procedure, "npi","ccs_code")
-npi_vs_css = doctor_procedure[, .(proc_count = sum(line_srvc_cnt)), by = .(npi,ccs_code)] #pool similar procedures (with identical ccs codes)
-setkey(npi_vs_css, "npi","ccs_code")
-npi_vs_css= dcast(npi_vs_css, npi ~ ccs_code) #convert data.table from long to wide format (i.e. npi vs. ccs table)
-head(npi_vs_css)
+npi_vs_ccs = doctor_procedure[, .(proc_count = sum(line_srvc_cnt)), by = .(npi,ccs_code)] #pool similar procedures (with identical ccs codes)
+setkey(npi_vs_ccs, "npi","ccs_code")
+npi_vs_ccs= dcast(npi_vs_ccs, npi ~ ccs_code) #convert data.table from long to wide format (i.e. npi vs. ccs table)
+head(npi_vs_ccs)
 
 coreProcessingT = Sys.time()-coreStart
 coreProcessingT
@@ -184,7 +184,7 @@ start = Sys.time()
 #However, R's native data format saves the codes with leading zeros.
 
 #R.data file:
-save(physician_info, conversion_table, npi_vs_css, file='provider_vs_procedures2012.RData')
+save(physician_info, conversion_table, npi_vs_ccs, file='provider_vs_procedures2012.RData')
 
 savetime = Sys.time()-start
 savetime
