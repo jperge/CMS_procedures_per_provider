@@ -11780,7 +11780,7 @@ Further information on the Code conversion can be found here:<br>
 </div>
 <div class="cell border-box-sizing code_cell rendered">
 <div class="input">
-<div class="prompt input_prompt">In&nbsp;[96]:</div>
+<div class="prompt input_prompt">In&nbsp;[1]:</div>
 <div class="inner_cell">
     <div class="input_area">
 <div class=" highlight hl-r"><pre><span></span><span class="kp">rm</span><span class="p">(</span><span class="kt">list</span><span class="o">=</span><span class="kp">ls</span><span class="p">())</span>
@@ -11832,7 +11832,7 @@ load_or_install<span class="p">(</span>packageList<span class="p">)</span>
 </div>
 <div class="cell border-box-sizing code_cell rendered">
 <div class="input">
-<div class="prompt input_prompt">In&nbsp;[86]:</div>
+<div class="prompt input_prompt">In&nbsp;[2]:</div>
 <div class="inner_cell">
     <div class="input_area">
 <div class=" highlight hl-r"><pre><span></span>cms_filename <span class="o">=</span> <span class="s">&quot;Medicare_Provider_Util_Payment_PUF_CY2012.txt&quot;</span> <span class="c1">#available data for years 2012,2013,2014</span>
@@ -11867,7 +11867,7 @@ start <span class="o">=</span> <span class="kp">Sys.time</span><span class="p">(
 
 
 <div class="output_text output_subarea ">
-<pre>Time difference of 50.45854 secs</pre>
+<pre>Time difference of 51.17217 secs</pre>
 </div>
 
 </div>
@@ -11878,7 +11878,7 @@ start <span class="o">=</span> <span class="kp">Sys.time</span><span class="p">(
 </div>
 <div class="cell border-box-sizing code_cell rendered">
 <div class="input">
-<div class="prompt input_prompt">In&nbsp;[92]:</div>
+<div class="prompt input_prompt">In&nbsp;[3]:</div>
 <div class="inner_cell">
     <div class="input_area">
 <div class=" highlight hl-r"><pre><span></span><span class="kp">head</span><span class="p">(</span>physician_data<span class="p">)</span>
@@ -11917,7 +11917,7 @@ start <span class="o">=</span> <span class="kp">Sys.time</span><span class="p">(
 </div>
 <div class="cell border-box-sizing code_cell rendered">
 <div class="input">
-<div class="prompt input_prompt">In&nbsp;[93]:</div>
+<div class="prompt input_prompt">In&nbsp;[4]:</div>
 <div class="inner_cell">
     <div class="input_area">
 <div class=" highlight hl-r"><pre><span></span><span class="kp">colnames</span><span class="p">(</span>physician_data<span class="p">)</span>
@@ -11975,7 +11975,7 @@ start <span class="o">=</span> <span class="kp">Sys.time</span><span class="p">(
 </div>
 <div class="cell border-box-sizing code_cell rendered">
 <div class="input">
-<div class="prompt input_prompt">In&nbsp;[94]:</div>
+<div class="prompt input_prompt">In&nbsp;[5]:</div>
 <div class="inner_cell">
     <div class="input_area">
 <div class=" highlight hl-r"><pre><span></span><span class="c1">#physician data is large and clogs memory. Therefore I take what I need and clear the rest from the workspace:</span>
@@ -11987,7 +11987,7 @@ descriptor_vars <span class="o">=</span> <span class="kt">c</span><span class="p
 physician_info   <span class="o">=</span> physician_data<span class="p">[,</span> descriptor_vars<span class="p">]</span>
 doctor_procedure <span class="o">=</span> physician_data<span class="p">[,</span> <span class="kt">c</span><span class="p">(</span><span class="s">&#39;npi&#39;</span><span class="p">,</span> <span class="s">&#39;hcpcs_code&#39;</span><span class="p">,</span><span class="s">&#39;line_srvc_cnt&#39;</span> <span class="p">)]</span>
 conversion_table <span class="o">=</span> physician_data<span class="p">[,</span> <span class="kt">c</span><span class="p">(</span><span class="s">&#39;hcpcs_code&#39;</span><span class="p">,</span> <span class="s">&#39;hcpcs_description&#39;</span><span class="p">)]</span>
-<span class="c1">#rm(physician_data)</span>
+<span class="kp">rm</span><span class="p">(</span>physician_data<span class="p">)</span>
 </pre></div>
 
 </div>
@@ -12006,7 +12006,7 @@ conversion_table <span class="o">=</span> physician_data<span class="p">[,</span
 </div>
 <div class="cell border-box-sizing code_cell rendered">
 <div class="input">
-<div class="prompt input_prompt">In&nbsp;[95]:</div>
+<div class="prompt input_prompt">In&nbsp;[6]:</div>
 <div class="inner_cell">
     <div class="input_area">
 <div class=" highlight hl-r"><pre><span></span>physician_info <span class="o">=</span> physician_info<span class="p">[</span><span class="o">!</span><span class="kp">duplicated</span><span class="p">(</span>physician_info<span class="o">$</span>npi<span class="p">),]</span>  <span class="c1"># no time saved by converting to a data.table</span>
@@ -12028,7 +12028,7 @@ conversion_table <span class="o">=</span> physician_data<span class="p">[,</span
 </div>
 <div class="cell border-box-sizing code_cell rendered">
 <div class="input">
-<div class="prompt input_prompt">In&nbsp;[66]:</div>
+<div class="prompt input_prompt">In&nbsp;[7]:</div>
 <div class="inner_cell">
     <div class="input_area">
 <div class=" highlight hl-r"><pre><span></span>conversion_table <span class="o">=</span> conversion_table<span class="p">[</span><span class="o">!</span><span class="kp">duplicated</span><span class="p">(</span>conversion_table<span class="o">$</span>hcpcs_code<span class="p">),]</span>
@@ -12043,7 +12043,7 @@ setkey<span class="p">(</span>conversion_table<span class="p">,</span> hcpcs_cod
 </div>
 <div class="cell border-box-sizing code_cell rendered">
 <div class="input">
-<div class="prompt input_prompt">In&nbsp;[67]:</div>
+<div class="prompt input_prompt">In&nbsp;[8]:</div>
 <div class="inner_cell">
     <div class="input_area">
 <div class=" highlight hl-r"><pre><span></span><span class="kp">head</span><span class="p">(</span>conversion_table<span class="p">)</span>
@@ -12082,7 +12082,7 @@ setkey<span class="p">(</span>conversion_table<span class="p">,</span> hcpcs_cod
 </div>
 <div class="cell border-box-sizing code_cell rendered">
 <div class="input">
-<div class="prompt input_prompt">In&nbsp;[68]:</div>
+<div class="prompt input_prompt">In&nbsp;[9]:</div>
 <div class="inner_cell">
     <div class="input_area">
 <div class=" highlight hl-r"><pre><span></span>ccs_file <span class="o">=</span> <span class="s">&#39;2016_ccs_services_procedures.csv&#39;</span>
@@ -12125,7 +12125,7 @@ setkey<span class="p">(</span>ccs_table<span class="p">,</span>Code.Range<span c
 </div>
 <div class="cell border-box-sizing code_cell rendered">
 <div class="input">
-<div class="prompt input_prompt">In&nbsp;[69]:</div>
+<div class="prompt input_prompt">In&nbsp;[10]:</div>
 <div class="inner_cell">
     <div class="input_area">
 <div class=" highlight hl-r"><pre><span></span><span class="c1"># combine the above two tables</span>
@@ -12138,7 +12138,7 @@ setkey<span class="p">(</span>ccs_table<span class="p">,</span>Code.Range<span c
 </div>
 <div class="cell border-box-sizing code_cell rendered">
 <div class="input">
-<div class="prompt input_prompt">In&nbsp;[70]:</div>
+<div class="prompt input_prompt">In&nbsp;[11]:</div>
 <div class="inner_cell">
     <div class="input_area">
 <div class=" highlight hl-r"><pre><span></span><span class="c1">#create an incremental sequence of CSS codes from Code.Range:</span>
@@ -12188,7 +12188,7 @@ get_code_range <span class="o">&lt;-</span> <span class="kr">function</span><spa
 </div>
 <div class="cell border-box-sizing code_cell rendered">
 <div class="input">
-<div class="prompt input_prompt">In&nbsp;[71]:</div>
+<div class="prompt input_prompt">In&nbsp;[12]:</div>
 <div class="inner_cell">
     <div class="input_area">
 <div class=" highlight hl-r"><pre><span></span><span class="c1"># Expand CCS table, i.e. list every HCPCS code specified within the Code.Range</span>
@@ -12206,7 +12206,7 @@ conversion_table <span class="o">=</span> <span class="kp">merge</span><span cla
 </div>
 <div class="cell border-box-sizing code_cell rendered">
 <div class="input">
-<div class="prompt input_prompt">In&nbsp;[72]:</div>
+<div class="prompt input_prompt">In&nbsp;[13]:</div>
 <div class="inner_cell">
     <div class="input_area">
 <div class=" highlight hl-r"><pre><span></span><span class="kp">head</span><span class="p">(</span>conversion_table<span class="p">)</span>
@@ -12256,7 +12256,7 @@ cells in the final matrix (npi_vs_css) correspond to total procedure counts for 
 </div>
 <div class="cell border-box-sizing code_cell rendered">
 <div class="input">
-<div class="prompt input_prompt">In&nbsp;[73]:</div>
+<div class="prompt input_prompt">In&nbsp;[14]:</div>
 <div class="inner_cell">
     <div class="input_area">
 <div class=" highlight hl-r"><pre><span></span><span class="c1"># Merge CCS codes into physician data frame:</span>
@@ -12271,7 +12271,7 @@ setkey<span class="p">(</span>toAppend<span class="p">,</span>hcpcs_code<span cl
 </div>
 <div class="cell border-box-sizing code_cell rendered">
 <div class="input">
-<div class="prompt input_prompt">In&nbsp;[74]:</div>
+<div class="prompt input_prompt">In&nbsp;[15]:</div>
 <div class="inner_cell">
     <div class="input_area">
 <div class=" highlight hl-r"><pre><span></span><span class="kp">head</span><span class="p">(</span>toAppend<span class="p">)</span>
@@ -12310,7 +12310,7 @@ setkey<span class="p">(</span>toAppend<span class="p">,</span>hcpcs_code<span cl
 </div>
 <div class="cell border-box-sizing code_cell rendered">
 <div class="input">
-<div class="prompt input_prompt">In&nbsp;[75]:</div>
+<div class="prompt input_prompt">In&nbsp;[16]:</div>
 <div class="inner_cell">
     <div class="input_area">
 <div class=" highlight hl-r"><pre><span></span>doctor_procedure <span class="o">=</span> data.table<span class="p">(</span>doctor_procedure<span class="p">)</span>
@@ -12325,7 +12325,7 @@ doctor_procedure <span class="o">=</span> <span class="kp">merge</span><span cla
 </div>
 <div class="cell border-box-sizing code_cell rendered">
 <div class="input">
-<div class="prompt input_prompt">In&nbsp;[76]:</div>
+<div class="prompt input_prompt">In&nbsp;[17]:</div>
 <div class="inner_cell">
     <div class="input_area">
 <div class=" highlight hl-r"><pre><span></span><span class="kp">head</span><span class="p">(</span>doctor_procedure<span class="p">)</span>
@@ -12364,13 +12364,13 @@ doctor_procedure <span class="o">=</span> <span class="kp">merge</span><span cla
 </div>
 <div class="cell border-box-sizing code_cell rendered">
 <div class="input">
-<div class="prompt input_prompt">In&nbsp;[77]:</div>
+<div class="prompt input_prompt">In&nbsp;[18]:</div>
 <div class="inner_cell">
     <div class="input_area">
 <div class=" highlight hl-r"><pre><span></span>setkey<span class="p">(</span>doctor_procedure<span class="p">,</span> <span class="s">&quot;npi&quot;</span><span class="p">,</span><span class="s">&quot;ccs_code&quot;</span><span class="p">)</span>
-npi_vs_css <span class="o">=</span> doctor_procedure<span class="p">[,</span> <span class="m">.</span><span class="p">(</span>proc_count <span class="o">=</span> <span class="kp">sum</span><span class="p">(</span>line_srvc_cnt<span class="p">)),</span> by <span class="o">=</span> <span class="m">.</span><span class="p">(</span>npi<span class="p">,</span>ccs_code<span class="p">)]</span> <span class="c1">#pool similar procedures (with identical ccs codes)</span>
-setkey<span class="p">(</span>npi_vs_css<span class="p">,</span> <span class="s">&quot;npi&quot;</span><span class="p">,</span><span class="s">&quot;ccs_code&quot;</span><span class="p">)</span>
-npi_vs_css<span class="o">=</span> dcast<span class="p">(</span>npi_vs_css<span class="p">,</span> npi <span class="o">~</span> ccs_code<span class="p">)</span> <span class="c1">#convert data.table from long to wide format (i.e. npi vs. ccs table)</span>
+npi_vs_ccs <span class="o">=</span> doctor_procedure<span class="p">[,</span> <span class="m">.</span><span class="p">(</span>proc_count <span class="o">=</span> <span class="kp">sum</span><span class="p">(</span>line_srvc_cnt<span class="p">)),</span> by <span class="o">=</span> <span class="m">.</span><span class="p">(</span>npi<span class="p">,</span>ccs_code<span class="p">)]</span> <span class="c1">#pool similar procedures (with identical ccs codes)</span>
+setkey<span class="p">(</span>npi_vs_ccs<span class="p">,</span> <span class="s">&quot;npi&quot;</span><span class="p">,</span><span class="s">&quot;ccs_code&quot;</span><span class="p">)</span>
+npi_vs_ccs<span class="o">=</span> dcast<span class="p">(</span>npi_vs_ccs<span class="p">,</span> npi <span class="o">~</span> ccs_code<span class="p">)</span> <span class="c1">#convert data.table from long to wide format (i.e. npi vs. ccs table)</span>
 </pre></div>
 
 </div>
@@ -12394,10 +12394,10 @@ npi_vs_css<span class="o">=</span> dcast<span class="p">(</span>npi_vs_css<span 
 </div>
 <div class="cell border-box-sizing code_cell rendered">
 <div class="input">
-<div class="prompt input_prompt">In&nbsp;[78]:</div>
+<div class="prompt input_prompt">In&nbsp;[19]:</div>
 <div class="inner_cell">
     <div class="input_area">
-<div class=" highlight hl-r"><pre><span></span><span class="kp">head</span><span class="p">(</span>npi_vs_css<span class="p">)</span>
+<div class=" highlight hl-r"><pre><span></span><span class="kp">head</span><span class="p">(</span>npi_vs_ccs<span class="p">)</span>
 </pre></div>
 
 </div>
@@ -12449,14 +12449,14 @@ npi_vs_css<span class="o">=</span> dcast<span class="p">(</span>npi_vs_css<span 
 start <span class="o">=</span> <span class="kp">Sys.time</span><span class="p">()</span>
 <span class="c1"># write.csv(physician_info, file = &quot;physician_info.csv&quot;, row.names=FALSE, na=&quot;&quot;)</span>
 <span class="c1"># write.csv(conversion_table, file = &quot;CPT_to_CCS_conversion.csv&quot;, row.names=FALSE, na=&quot;&quot;)</span>
-<span class="c1"># write.csv(npi_vs_css, file = &quot;provider_vs_procedures2012.csv&quot;, row.names=FALSE, na=&quot;&quot;)</span>
+<span class="c1"># write.csv(npi_vs_ccs, file = &quot;provider_vs_procedures2012.csv&quot;, row.names=FALSE, na=&quot;&quot;)</span>
 
 <span class="c1">#Note that write.csv saves numeric hcpcs codes as an arabic number e.g. &#39;102&#39;, omiting zero characters in the beginning.</span>
 <span class="c1">#This would cause mismatches later when mapping fixed-length character arrays such as &#39;00102&#39;. </span>
 <span class="c1">#However, R&#39;s native data format saves the codes with leading zeros.</span>
 
 <span class="c1">#R.data file:</span>
-<span class="kp">save</span><span class="p">(</span>physician_info<span class="p">,</span> conversion_table<span class="p">,</span> npi_vs_css<span class="p">,</span> file<span class="o">=</span><span class="s">&#39;provider_vs_procedures2012.RData&#39;</span><span class="p">)</span>
+<span class="kp">save</span><span class="p">(</span>physician_info<span class="p">,</span> conversion_table<span class="p">,</span> npi_vs_ccs<span class="p">,</span> file<span class="o">=</span><span class="s">&#39;provider_vs_procedures2012.RData&#39;</span><span class="p">)</span>
 
 <span class="kp">Sys.time</span><span class="p">()</span><span class="o">-</span>start
 </pre></div>
@@ -12473,37 +12473,11 @@ start <span class="o">=</span> <span class="kp">Sys.time</span><span class="p">(
 
 
 <div class="output_text output_subarea ">
-<pre>Time difference of 24.39235 secs</pre>
+<pre>Time difference of 24.26224 secs</pre>
 </div>
 
 </div>
 
-</div>
-</div>
-
-</div>
-<div class="cell border-box-sizing code_cell rendered">
-<div class="input">
-<div class="prompt input_prompt">In&nbsp;[&nbsp;]:</div>
-<div class="inner_cell">
-    <div class="input_area">
-<div class=" highlight hl-r"><pre><span></span>
-</pre></div>
-
-</div>
-</div>
-</div>
-
-</div>
-<div class="cell border-box-sizing code_cell rendered">
-<div class="input">
-<div class="prompt input_prompt">In&nbsp;[&nbsp;]:</div>
-<div class="inner_cell">
-    <div class="input_area">
-<div class=" highlight hl-r"><pre><span></span>
-</pre></div>
-
-</div>
 </div>
 </div>
 
@@ -12511,6 +12485,32 @@ start <span class="o">=</span> <span class="kp">Sys.time</span><span class="p">(
 <div class="cell border-box-sizing code_cell rendered">
 <div class="input">
 <div class="prompt input_prompt">In&nbsp;[21]:</div>
+<div class="inner_cell">
+    <div class="input_area">
+<div class=" highlight hl-r"><pre><span></span><span class="kp">rm</span><span class="p">(</span><span class="kt">list</span><span class="o">=</span><span class="kp">ls</span><span class="p">())</span>
+</pre></div>
+
+</div>
+</div>
+</div>
+
+</div>
+<div class="cell border-box-sizing code_cell rendered">
+<div class="input">
+<div class="prompt input_prompt">In&nbsp;[&nbsp;]:</div>
+<div class="inner_cell">
+    <div class="input_area">
+<div class=" highlight hl-r"><pre><span></span>
+</pre></div>
+
+</div>
+</div>
+</div>
+
+</div>
+<div class="cell border-box-sizing code_cell rendered">
+<div class="input">
+<div class="prompt input_prompt">In&nbsp;[&nbsp;]:</div>
 <div class="inner_cell">
     <div class="input_area">
 <div class=" highlight hl-r"><pre><span></span>
