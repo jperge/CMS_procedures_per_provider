@@ -182,7 +182,7 @@ mtext('Relationship of the three most common codes within opthalmology', outer=T
 ## Distribution of Code15/220 in opthalmology (plot6)
 ##************************************************************
 qplot(ratio, data = widedat, geom = 'density') + xlim(0, 3) + 
-  labs(x='Ratio (code15/220)',y='Frequency', title='Distribution of ratio values in opthamology')+
+  labs(x='Ratio (code15/220)',y='Frequency', title='Distribution of ratio values in optometry')+
   xlim(0, 1.5)+ theme_bw()
 
 ##************************************************************
@@ -315,7 +315,29 @@ g + labs(x='Work experience (years after graduation)', y='Treatment Efficacy (# 
 # quality of care just by looking at this measure.
 
 ##************************************************************
-## Diversity of procedure codes across specialities (plot12)
+#Plot office visit times across physician age groups (years of experience) (plot12)
+##************************************************************
+phys.info = physician_info[!graduation.year %in% NA]
+phys.info = phys.info[!office_mins %in% NA]
+
+#Select for physician types:
+phys_sel = c('Dermatology', 'Physical Therapist', 'Cardiology', 'Orthopedic Surgery')
+cc = phys.info[provider_type %in% phys_sel] #provider info (and list of npis) within the top popular provider types. 
+setkey(cc,npi)
+sub_npi_ccs = npi_vs_tot_count[cc] # inner join on selected npi numbers, pulling the npi specific info into procedure count
+sub_npi_ccs = sub_npi_ccs[,expyrs := 2012-graduation.year]
+
+median_freq = sub_npi_ccs[, .(medi_office_min = median(office_mins, na.rm=T)), 
+                          by=.(expyrs, provider_type)]
+
+g <- ggplot(median_freq, aes(expyrs, medi_office_min)) + geom_point() 
+g = g + facet_wrap(~provider_type, nrow=2) #+geom_smooth(method='lm', se=FALSE) 
+#g = g + coord_cartesian(xlim = c(0,60),ylim = c(0,7.5))
+g + labs(x='Work Experience (years after graduation)', y='Medium Length of Office Visit (min))',
+         title= 'Office visits at more experienced providers are shorter')
+
+##************************************************************
+## Diversity of procedure codes across specialities (plot13)
 ##************************************************************
 #Select for physician types:
 phys_sel = c('Dermatology', 'Physical Therapist', 'Cardiology', 'Orthopedic Surgery')
