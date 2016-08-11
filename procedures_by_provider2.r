@@ -1,4 +1,4 @@
-### Explore healthcare claims data on medical procedures and costs (Medicare, 2012)
+### Explore medical procedures and costs in healthcare claims data (Medicare, 2012)
 ### Part 1: Obtaining and arranging data
 # 
 # Janos Perge, 08/11/2016

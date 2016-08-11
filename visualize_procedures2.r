@@ -1,5 +1,6 @@
-# Visualize CMS data from the Medicare-Provider-Utilization-Payment public use file, year 2012.
-# Janos A. Perge, 7/31/2016
+### Explore medical procedures and costs in healthcare claims data (Medicare, 2012)
+### Part 2: Data exploration and visualization
+# Janos A. Perge, 8/11/2016
 # 
 # To assess the risk associated with a medical procedure, one needs to better  
 # understand the physician who carries out the procedure. This visualization exercise  
