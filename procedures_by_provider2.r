@@ -1,24 +1,49 @@
-
-# ### Medical procedures by physician, Medicare data (2012)
-# Janos Perge, 07/25/2016
+### Explore healthcare claims data on medical procedures and costs (Medicare, 2012)
+### Part 1: Obtaining and arranging data
+# 
+# Janos Perge, 08/11/2016
 # 
 # Purpose:   
-#   1) Access Medicare data on the number of performed medical procedures per physician (as a proxi for quality of care).   
-#   2) Convert HCPCS (or CPT) procedure codes to CCS codes for further analysis  
-#   3) Save data in three spreadsheets: #1-Provider information, #2-CPT-to-CCS conversion table and #3-Number of performed procedures per provider, broken down to different CCS categories (244 different procedure types)
-#   
-#   Before running this code:  
-#   -Get the data. This is a public use file downloadable from CMS:
-#   https://www.cms.gov/apps/ama/license.asp?file=http://download.cms.gov/Research-Statistics-Data-and-Systems/Statistics-Trends-and-Reports/Medicare-Provider-Charge-Data/Downloads/Medicare_Provider_Util_Payment_PUF_CY2012_update.zip
-#   Visit the url above, accept CMS disclaimer, download and unzip file (2GB) and place it within the same directory as this script.
-#   
-#   -I assume you run this script in RStudio. If running base-R, you should manually set the working directory to the data-containing folder, or uncomment lines X-Y. 
-#   
-#   -Note that most of the runtime is spent on opening 2GB of data and dumping it into RAM (~5min on my Win10 machine with core i7 and 8GB RAM) or writing the results to disc (~1.5 min). The actual processing time of the data on my machine took ~40sec. If you need to run this code repeatedly, uncomment line "save(physician_data, file=my_data_file)", to save the entire CMS spreadsheet into an .RData file. This is smaller and faster to read than the original data file.  
-#   
-#   Data is described in detail in 'Medicare-Physician-and-Other-Supplier-PUF-Methodology.PDF'.  
-#   Further information on the Code conversion can be found here:  
-#     https://www.hcup-us.ahrq.gov/toolssoftware/ccs_svcsproc/ccssvcproc.jsp#info
+# 1) Access data on the number and cost of medical procedures performed by Medicare providers.   
+# 2) Convert HCPCS (or CPT) procedure codes to CCS codes for further analysis.  
+# 3) Save data in three spreadsheets: 
+#   #1-Provider information, 
+#   #2-CPT-to-CCS conversion table and 
+#   #3-Number of performed procedures per provider, broken down to different CCS categories (244 different procedure types). 
+#   #4-Explore and visualize this saved data set by running 'visualize_procedures.ipynb'.
+# 
+# To run this analysis:  
+# -Clone this github repository on your hard drive (git@github.com:jperge/CMS_procedures_per_provider.git)
+# 
+# -Get the Medicare-provider-charge data. This is a publicly available file on medical procedures and the associated 
+# cost performed by Medicare providers during year 2012. The data is downloadable from CMS:
+# https://www.cms.gov/apps/ama/license.asp?file=http://download.cms.gov/Research-Statistics-Data-and-Systems/Statistics-Trends-and-Reports/Medicare-Provider-Charge-Data/Downloads/Medicare_Provider_Util_Payment_PUF_CY2012_update.zip
+# Visit the url above, accept the CMS disclaimer, download and unzip file (2GB) and place it within the same directory as this script. 
+# The data is described in detail in 'Medicare-Physician-and-Other-Supplier-PUF-Methodology.PDF', also included in this repository.  
+# 
+# -All analyzis is written in R. If you are using RStudio, make sure to manually set the working directory to this source file location
+# (under Session/Set Working Directory/To Source File Location
+# 
+# -Note that most of the runtime is spent on opening 2GB of data and dumping it into RAM 
+# (~1min on my Win10 machine with core i7 and 8GB RAM) or writing the results to disc (~1 min). 
+# The actual processing time of the data on my machine took ~40sec. If you need to run this code repeatedly, 
+# uncomment line "save(physician_data, file=my_data_file)", which will save the entire CMS spreadsheet into an .RData file. 
+# This file is smaller and faster to read than the original data file.  
+# 
+# To simplify (or compress) the roughly 9000 procedure codes into 244 categories, I convert HCPCS (or CPT) codes 
+# to CCS codes using a conversion table available by HCUP (https://www.hcup-us.ahrq.gov). 
+# This table is already downloaded in this repository (2016_ccs_services_procedures.csv), 
+# but is also available online with further information on the conversion:  
+# https://www.hcup-us.ahrq.gov/toolssoftware/ccs_svcsproc/ccssvcproc.jsp#info
+# 
+# To obtain information on the provider's graduation year, I use a different data source from CMS 
+# (https://data.medicare.gov/data/physician-compare) and merge it into this data set using NPI as a cross link. 
+# The extracted graduation years are already included in this repository (physician_grad_year.csv). 
+# However, if you wish to repeat the process, the source code is in 'obtain_gradyear.ipynb'.
+# 
+# Big thanks to Vik Paruchuri for providing example code which got me started on this CMS data set!  
+# (http://www.vikparuchuri.com/blog/exploring-us-healthcare-data/). Further analyses on this data set can be also found 
+# on Propublica (https://www.propublica.org/series/examining-medicare).
 
 rm(list=ls())
 
@@ -52,23 +77,20 @@ load_or_install<-function(package_names)
 
 load_or_install(packageList)
 
-cms_filename = "Medicare_Provider_Util_Payment_PUF_CY2012.txt" #available data for years 2012,2013,2014
+cms_filename = "Medicare_Provider_Util_Payment_PUF_CY2012.txt" #data is also available on CMS for years 2013 and 2014
 my_data_file = "procedures2012.RData"
 
 start = Sys.time()
-#open data from tabular file saved on HD or from Rdatafile:
+#open data from tabular or Rdata file saved on HD:
 if(file.exists(my_data_file) && !exists("physician_data")){
   load(my_data_file)
 } else if(!file.exists(my_data_file)) {
-  #physician_data = read.delim(cms_filename, stringsAsFactors=FALSE)
   physician_data = data.frame(fread(cms_filename)) #This second way of reading data is ~5 times faster!
   physician_data = physician_data[2:nrow(physician_data),]
   colnames(physician_data) = tolower(colnames(physician_data))
 
   # save(physician_data, file=my_data_file)
 }
-# physician_data = data.table(physician_data)
-    
 Sys.time()-start
 
 head(physician_data)
@@ -89,6 +111,9 @@ doctor_procedure = physician_data[, c('npi', 'hcpcs_code','line_srvc_cnt',"bene_
 conversion_table = physician_data[, c('hcpcs_code', 'hcpcs_description')]
 rm(physician_data)
 
+#-----------------------------------------------------------------------------
+## Spreadsheet #1: Doctor's parameters such as NPI, Name, state, gender, etc...
+#-----------------------------------------------------------------------------
 #bring in physician years of expertise:
 npi_file = 'physician_grad_year.csv'
 npi_frame = data.frame(fread(npi_file))
@@ -99,6 +124,9 @@ setkey(physician_info, npi)
 physician_info = unique(physician_info)
 physician_info = merge(physician_info, npi_frame, all.x=TRUE) #left outer join
 
+#-----------------------------------------------------------------------------
+# Spreadsheet #2: HCPCS/CPT code to CCS conversion¶
+#-----------------------------------------------------------------------------
 conversion_table = conversion_table[!duplicated(conversion_table$hcpcs_code),]
 conversion_table = data.table(conversion_table)
 setkey(conversion_table, hcpcs_code)
@@ -159,6 +187,11 @@ conversion_table = merge(conversion_table,expanded_ccs, by='hcpcs_code')
 
 head(conversion_table)
 
+#-----------------------------------------------------------------------------
+## Spreadsheet #3: Provider vs Procedure count.  
+#-----------------------------------------------------------------------------
+#cells in the final matrix (npi_vs_css) correspond to total procedure counts for a given provider and given CCS category
+
 # Merge CCS codes into physician data frame:
 toAppend = conversion_table[, .(hcpcs_code ,ccs_code)]
 setkey(toAppend,hcpcs_code)
@@ -173,21 +206,48 @@ head(doctor_procedure)
 
 #pool similar procedures (with identical ccs codes) per provider
 setkey(doctor_procedure, "npi","ccs_code")
-doctor_procedure = doctor_procedure[,proc_per_patient := line_srvc_cnt/bene_unique_cnt]
+doctor_procedure = doctor_procedure[,proc_per_patient := bene_day_srvc_cnt/bene_unique_cnt]
 npi_vs_ccs = doctor_procedure[, .(proc_cnt=sum(line_srvc_cnt, na.rm=T), 
-                                 uniq_cnt=sum(bene_unique_cnt, na.rm=T),
-                                 day_srvc_cnt=sum(bene_day_srvc_cnt, na.rm=T),
-                                 bene_cnt=sum(bene_unique_cnt, na.rm=T),
-                                 med_proc_per_patient=median(proc_per_patient, na.rm=T), 
-                                 est_allo_amt=sum(average_medicare_allowed_amt*line_srvc_cnt, na.rm=T), 
-                                 est_pay_amt=sum(average_medicare_payment_amt*line_srvc_cnt), na.rm=T), 
-                                 by = .(npi,ccs_code)] 
-# setkey(npi_vs_ccs, "npi","ccs_code")
-# npi_vs_ccs= dcast(npi_vs_ccs, npi ~ ccs_code) #convert data.table from long to wide format (i.e. npi vs. ccs table)
+                                  uniq_cnt=sum(bene_unique_cnt, na.rm=T),
+                                  day_srvc_cnt=sum(bene_day_srvc_cnt, na.rm=T),
+                                  bene_cnt=sum(bene_unique_cnt, na.rm=T),
+                                  med_proc_per_patient=median(proc_per_patient, na.rm=T), 
+                                  est_allo_amt=sum(average_medicare_allowed_amt*line_srvc_cnt, na.rm=T), 
+                                  est_pay_amt=sum(average_medicare_payment_amt*line_srvc_cnt, na.rm=T)), 
+                              by = .(npi,ccs_code)] 
 
 tail(npi_vs_ccs)
 
-#csv files:
+#These procedure codes will be used to estimate the average length of outpatient office visits:
+sub = conversion_table[hcpcs_code %in% c('99211', '99212', '99213', '99214', '99215')]
+sub
+
+#calculate the average duration of office visits per provider and merge it into physician_info table
+#use hcpcs codes 99211-215 to estimate office visit durations
+#Half of the providers (~400,000) have these office visit codes
+setkey(doctor_procedure,hcpcs_code)
+office_visits = doctor_procedure[hcpcs_code %in% c('99211', '99212', '99213', '99214', '99215')]
+setkey(office_visits, hcpcs_code)
+office_visits = office_visits[,cpt := as.numeric(as.character(hcpcs_code))]
+
+setkey(office_visits, cpt)
+office_visits = office_visits[cpt==99211,visit_dur := 5]
+office_visits = office_visits[cpt==99212,visit_dur := 10]
+office_visits = office_visits[cpt==99213,visit_dur := 15]
+office_visits = office_visits[cpt==99214,visit_dur := 25]
+office_visits = office_visits[cpt==99215,visit_dur := 40]
+
+office_visits = office_visits[, tot_office_mins:= visit_dur*line_srvc_cnt]
+setkey(office_visits, npi)
+office_per_doc = office_visits[,.(office_mins = sum(tot_office_mins,na.rm=T)/sum(line_srvc_cnt,na.rm=T)), by=npi]
+
+#merge this into physician info table:
+physician_info = merge(physician_info, office_per_doc, all.x=TRUE)
+
+
+#-------------------------------------------------------------------------
+## Save the results
+#-------------------------------------------------------------------------
 start = Sys.time()
 # write.csv(physician_info, file = "physician_info.csv", row.names=FALSE, na="")
 # write.csv(conversion_table, file = "CPT_to_CCS_conversion.csv", row.names=FALSE, na="")
@@ -203,11 +263,4 @@ save(physician_info, conversion_table, npi_vs_ccs, file='provider_vs_procedures_
 Sys.time()-start
 
 rm(list=ls())
-
-
-
-
-
-
-
 

@@ -54,7 +54,7 @@ midTierSpecialities = counts[seq(21,32),]
 top10
 
 ##************************************************************
-## Diversity of revenues across specialities (plot1)
+## Diversity of procedure costs across specialities (plot1)
 ##************************************************************
 setkey(physician_info,npi)
 sub_npi_ccs = npi_vs_tot_count[physician_info] 
@@ -77,9 +77,21 @@ g + geom_bar(position="dodge",stat="identity") +coord_flip() +
     plot.title=element_text(face="bold",hjust=c(0,0)) #changes font face and location for graph title
   )
 
+##************************************************************
+## Diversity of procedure codes across specialities (plot13)
+##************************************************************
+#Select for physician types:
+phys_sel = c('Dermatology', 'Physical Therapist', 'Cardiology', 'Orthopedic Surgery')
+cc = physician_info[provider_type %in% phys_sel] #provider info (and list of npis) within the top popular provider types. 
+setkey(cc,npi)
+sub_npi_ccs = npi_vs_ccs[cc] # join on selected npi numbers (of popular types), pulling the npi specific info into procedure count
+
+g <- ggplot(sub_npi_ccs, aes(ccs_code, proc_cnt)) + geom_point(color = 'blue', size = 1, alpha=1/4) 
+g <- g + facet_wrap(~provider_type, nrow=1) + coord_cartesian(ylim = c(0,200000))
+g + labs(x='Procedure type (CCS)', y='# of procedures',title = 'Distribution of procedures is characteristic to the speciality')
 
 ##************************************************************
-## Diversity of revenues within a speciality (plot2)
+## Diversity of procedure counts and associated costs within a speciality (plot2)
 ##************************************************************
 #select multiple specialities
 phys_sel = c('Dermatology', 'Physical Therapist', 'Cardiology', 'Optometry')
@@ -92,15 +104,16 @@ sub_npi_ccs = npi_vs_tot_count[cc]
 g <- ggplot(sub_npi_ccs, aes(tot_cnt, tot_pay)) + geom_point(color = 'blue', size = 1, alpha=1/4) 
 g = g + facet_wrap(~provider_type, ncol=2)+geom_smooth(method = 'lm', se=FALSE) 
 g = g + coord_cartesian(xlim = c(0,20000),ylim = c(0,2000000))
-g + labs(x='Total # procedures in 2012', y='Total revenue ($/year)', title= 'Diversity of revenues within a speciality')
+g + labs(x='Total # procedures in 2012', y='Total claims ($/year)', title= 'Diversity of procedure costs within a speciality')
 
-# 2) Cost of procedures varies significantly within specialities. 
+# Cost of procedures varies significantly within specialities. 
 # Each dot corresponds to a physician. Certain disciplines vary more, while others 
-# (e.g. physical therapist) the cost is much more a function of procedure counts.
+# (e.g. physical therapist) the cost follows closely the procedure counts.
+#
 # Some specialities could be divided into subspecialities (e.g. Dermatology, Optometry). 
 # These subspecialities have different work loads and pay scales. 
 # Other examples of this are: 'Pathology', 'Neurology', 'Radiation Oncology'-three groups, 'Clinical Laboratory'.
-# Below I examine this closer by looking at what procedures these providers perform.
+# Let's examine why this happens by looking at the most commonly performed procedures within optometry
 
 ##************************************************************
 ## What are the subgroups within optometry? (plot3)
@@ -113,7 +126,7 @@ sub_npi_ccs = npi_vs_tot_count[cc]
 
 g <- ggplot(sub_npi_ccs, aes(tot_cnt, tot_pay)) + geom_point(color = 'blue', size = 1, alpha=1/4) 
 g = g + coord_cartesian(xlim = c(0,18000),ylim = c(0,600000))
-g + labs(x='Total # procedures in 2012', y='Total revenue ($/year)', title= 'Optometrists fall into at least two groups')
+g + labs(x='Total # procedures in 2012', y='Total claims ($/year)', title= 'Optometrists fall into at least two sub-groups')
 
 ##************************************************************
 ## Distribution of procedure codes within optometry (plot4)
@@ -140,10 +153,11 @@ codenames = unique(codenames)
 common_procedures = common_procedures[codenames, nomatch=0] #inner join
 common_procedures
 
-# Most common procedures are CCS15:Lens and cataract procedures, 
-# CCS220: Ophthalmologic and otologic diagnosis and treatment,
-# and CCS227: Other diagnostic procedures (interview, evaluation, consultation). 
-# What is the distribution of CCS15 and CCS227 across the opthalmologists?
+# The three common procedures are: 
+# -CCS15:Lens and cataract procedures, 
+# -CCS220: Ophthalmologic and otologic diagnosis and treatment, and 
+# -CCS227: Other diagnostic procedures (interview, evaluation, consultation).   
+# Let's examine the relationship across these codes within the group of opthalmologists.
 
 #Rearrange three most common procedure code counts into three columns
 setkey(sub_npi_ccs, ccs_code)
@@ -154,7 +168,7 @@ setkey(longdat, "npi","ccs_code")
 head(longdat)
 
 widedat = dcast(longdat, npi ~ ccs_code) #convert data.table from long to wide format
-widedat[is.na(widedat)] = 1
+widedat[is.na(widedat)] = 1 #Assign a value of '1' to missing data instead of '0' to avoid dividing by zero
 setnames(widedat,"15","code15")
 setnames(widedat,"220","code220")
 setnames(widedat,"227","code227")
@@ -170,17 +184,22 @@ head(cataractProvs)
 ## Relationship of the three most common codes within opthalmology (plot5)
 ##************************************************************
 par(mfrow = c(1,3))
-plot(widedat$code15, widedat$code220, main ='15 vs 220')
-plot(widedat$code15, widedat$code227, main='15 vs 227')
-plot(widedat$code220, widedat$code227, main='220 vs 227')
+plot(widedat$code15, widedat$code220, main ='Code 15 vs 220')
+plot(widedat$code15, widedat$code227, main='Code 15 vs 227')
+plot(widedat$code220, widedat$code227, main='Code 220 vs 227')
 mtext('Relationship of the three most common codes within opthalmology', outer=TRUE)
 
-# Code 15 seems to be different from code220 or 227. So the ratio of procedures 
-# say code15/code220 might characterize a provider.
+# Code15 procedure counts when plotted against code220 or 227 counts separate providers into two clusters:
+# i) those who perform code15 rarely but do code 220 or 227 frequently (the sharp cluster on the left), and
+# ii) those who perform code15 frequently, but code220 or 227 less (the more diffuse cluster in the left and center plot). 
+# Code 220 against 227 does not separate providers. So the frequency of code15 relative to the other codes 
+# (either 220 or 227) characterizes the provider's subspecialty. (Each symbol in these plots is a provider)
 
 ##************************************************************
 ## Distribution of Code15/220 in opthalmology (plot6)
 ##************************************************************
+# Calculate the ratio of code15/code220 procedures for each provider (above), and
+# plot the distribution of this ratio for all optometrist:
 qplot(ratio, data = widedat, geom = 'density') + xlim(0, 3) + 
   labs(x='Ratio (code15/220)',y='Frequency', title='Distribution of ratio values in optometry')+
   xlim(0, 1.5)+ theme_bw()
@@ -189,7 +208,10 @@ qplot(ratio, data = widedat, geom = 'density') + xlim(0, 3) +
 ## Lens/cataract procedure differentiates optometrists (plot7)
 ##************************************************************
 
-#Ratio of procedures shows two groups. Use this ratio as a label to update earlier scatter plot:
+#Ratio of procedures (code15/code220) shows two peaks in the distribution. Let's use this ratio to separate 
+#providers into two groups: those which perform code15 frequently and those who do not. 
+
+#Use these two groups to color code the earlier plot:
 cc = physician_info[provider_type == 'Optometry']
 setkey(cc,nppes_entity_code)  #remove organizations
 cc = cc[nppes_entity_code=='I']
@@ -197,11 +219,24 @@ setkey(cc,npi) # join on selected npi numbers, pulling the npi specific info int
 sub_npi_ccs = npi_vs_tot_count[cc]
 sub_npi_ccs = sub_npi_ccs[,cataract_procedures := npi %in% cataractProvs$npi]
 
-ggplot(sub_npi_ccs, aes(tot_cnt, tot_pay, color=cataract_procedures)) + geom_point(size = 1, alpha=1/4)+ 
-  coord_cartesian(xlim = c(0,18000),ylim = c(0,600000)) +
-  labs(x='Total # procedures in 2012', y='Total revenue ($/year)', 
-     title= 'Lens/cataract procedure differentiates optometrists') + 
-   theme_bw()
+ggplot(sub_npi_ccs, aes(tot_cnt, tot_pay, color=cataract_procedures))+ 
+  geom_point(size = 1, alpha=1/4)+
+  coord_cartesian(xlim = c(0,18000),ylim = c(0,600000))+
+  scale_colour_discrete(name  ="Performs lens/cataract procedure", labels=c("Rarely", "Frequently"))+
+  labs(x='Total # procedures in 2012', 
+       y='Total claims ($/year)', 
+       title= 'Lens/cataract procedure differentiates optometrists')+
+  theme_bw()
+
+## Cost of procedures across the three code types:
+setkey(npi_vs_ccs, ccs_code)
+codeSel = c(15, 220, 227)
+cc = npi_vs_ccs[ccs_code %in% codeSel] 
+sub_cc = cc[,.(cost_per_procedure = median(est_pay_amt/proc_cnt)), by=ccs_code] 
+sub_cc
+
+# As a confirmation: Lens/cataract procedures (code15) are roughly 10 times more expensive   
+# as diagnosis and treatment (code220) or diagnostic procedures (code270)
 
 ##************************************************************
 ## Gender inequality
@@ -212,13 +247,22 @@ sub_npi_ccs = npi_vs_tot_count[physician_info]
 table(physician_info$nppes_provider_gender)
 
 # Male providers on average also bring in more revenue on medicare claims. 
-# While this was initially surprising, I noticed that males also perform 
+# While this was initially surprising, notice that males also perform 
 # twice as many procedures. The cost per service is actually very comparable across gender:
 
 gend_pay = sub_npi_ccs[,.(tot_revenue=median(tot_pay, na.rm=T), 
                           proc_cnt = median(tot_cnt, na.rm=T), 
                           cost_per_service = median(avg_pay, 
                           na.rm=T)), by= nppes_provider_gender]
+
+ggplot(sub_npi_ccs, aes(x=tot_cnt, fill=nppes_provider_gender)) +
+  geom_histogram(binwidth=400, position="dodge")+
+  coord_cartesian(xlim = c(0,15000),ylim = c(0,30000))+
+  labs(x='# procedures/provider', y='# providers', title= 'Male providers outperform female ones')+
+  theme_bw()+
+  scale_fill_manual(values=c("gray", "red", "blue"),labels=c("Unknown", "Female", "Male"))+
+  guides(fill=guide_legend(title=NULL))+
+  theme(legend.position=c(.7, .8))
 
 #Procedure counts and costs across specialities:
 
@@ -276,9 +320,13 @@ ggplot(data=median.proc.pay.spec, aes(x=provider_type,y=med.pay,fill=factor(nppe
 # Male providers charge more for the total services because they also perform more procedures 
 
 ##************************************************************
-## Physician's productivity over years of expertise (plot10)
+## Provider's productivity over years of expertise (plot10)
 ##************************************************************
-#Plot only data points with known graduation years (~75% of all providers)
+# Quantify the provider's experience level as the number of years s/he spent practicing. 
+# This can be estimated from the provider's graduation year (assuming that most providers 
+# start working after graduation). 
+# To learn how graduation years were obtained see comments in 'procedures_by_provider2.r'
+                                                                                                                                                graduation). To learn how graduation years were obtained see comments in 'procedures_by_provider2.r'#Plot only data points with known graduation years (~75% of all providers)
 phys.info = physician_info[!graduation.year %in% NA]
 
 #Select for physician types:
@@ -311,8 +359,10 @@ g + labs(x='Work experience (years after graduation)', y='Treatment Efficacy (# 
 # after years of experience. However, the treatment efficacy is stable over 
 # the course of the physician's career (i.e. roughly the same # of procedure/patient). 
 # So increased output might be explained if appointment durations shorten over the years. 
-# Treatment efficacy is very close to one, so it might be difficult to see improvement in 
-# quality of care just by looking at this measure.
+# Let's see below if this is really the case. 
+
+# (Note that treatment efficacy is very close to one, so it might be difficult to see improvement in 
+# quality of care just by looking at this measure.)
 
 ##************************************************************
 #Plot office visit times across physician age groups (years of experience) (plot12)
@@ -334,17 +384,9 @@ g <- ggplot(median_freq, aes(expyrs, medi_office_min)) + geom_point()
 g = g + facet_wrap(~provider_type, nrow=2) #+geom_smooth(method='lm', se=FALSE) 
 #g = g + coord_cartesian(xlim = c(0,60),ylim = c(0,7.5))
 g + labs(x='Work Experience (years after graduation)', y='Medium Length of Office Visit (min))',
-         title= 'Office visits at more experienced providers are shorter')
-
-##************************************************************
-## Diversity of procedure codes across specialities (plot13)
-##************************************************************
-#Select for physician types:
-phys_sel = c('Dermatology', 'Physical Therapist', 'Cardiology', 'Orthopedic Surgery')
-cc = physician_info[provider_type %in% phys_sel] #provider info (and list of npis) within the top popular provider types. 
-setkey(cc,npi)
-sub_npi_ccs = npi_vs_ccs[cc] # join on selected npi numbers (of popular types), pulling the npi specific info into procedure count
-
-g <- ggplot(sub_npi_ccs, aes(ccs_code, proc_cnt)) + geom_point(color = 'blue', size = 1, alpha=1/4) 
-g <- g + facet_wrap(~provider_type, nrow=1) + coord_cartesian(ylim = c(0,200000))
-g + labs(x='Procedure type (CCS)', y='# of procedures',title = 'Distribution of procedures is characteristic to the speciality')
+         title= "Office visits shorten with the provider's experience")
+# Office visit durations do shorten by the providers years of experience. 
+# This is in a range of 10-20% decrease over multiple decades, which does not explain 
+# the four-fold increase in productivity of experienced providers. Note that office visits 
+# are only a fraction of the range of procedures providers perform, thus from this result 
+# we cannot say how much time a provider actually spends with a beneficiary.
